@@ -1,0 +1,12 @@
+{
+  "name": "com.avmedvedskiy.services",
+  "displayName": "Service Locator",
+  "version": "1.0.1",
+  "unity": "2020.3",
+  "author": "avmedvedskiy",
+  "description": "Service Locator",
+  "keywords": [
+    "service",
+    "locator"
+  ]
+}
