@@ -6,31 +6,31 @@ namespace Services
     [DefaultExecutionOrder(-1000)]
     public sealed class ProjectContext : MonoBehaviour
     {
-        private static readonly ServiceContainer _container = new ServiceContainer();
-        internal static ServiceContainer Container => _container;
+        internal static ServiceContainer Container { get; } = new ServiceContainer();
 
         [SerializeField] private List<MonoInstaller> _installers = new List<MonoInstaller>();
 
         private void Awake()
         {
+            DontDestroyOnLoad(this.gameObject);
             InstallBindings();
         }
 
         private void Start()
         {
-            _container.ForEach<IInitialize>((x) => x.Initialize());
+            Container.ForEach<IInitialize>((x) => x.Initialize());
         }
 
         private void InstallBindings()
         {
             foreach (var i in _installers)
-                i.InstallBindings(_container);
+                i.InstallBindings(Container);
         }
 
         //only for internal use
         internal static T GetService<T>()
         {
-            return _container.GetService<T>();
+            return Container.GetService<T>();
         }
     }
 }
