@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Services
 {
     /// <summary>
@@ -5,6 +7,7 @@ namespace Services
     /// </summary>
     public static class Inject
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T Service<T>() => ProjectContext.GetService<T>();
     }
 }

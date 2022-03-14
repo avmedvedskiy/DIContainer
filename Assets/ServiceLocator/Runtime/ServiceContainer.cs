@@ -15,6 +15,7 @@ namespace Services
 
         public void RemoveSingle(object service) => _services.Remove(service);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal T GetService<T>()
         {
             int count = _services.Count;
