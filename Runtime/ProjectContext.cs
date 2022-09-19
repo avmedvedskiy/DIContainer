@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration.Install;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -10,7 +12,7 @@ namespace Services
         private static readonly ServiceContainer _container = new ServiceContainer();
         internal static ServiceContainer Container => _container;
 
-        [SerializeField] private List<MonoInstaller> _installers = new List<MonoInstaller>();
+        [SerializeField] private MonoInstaller[] _installers = {};
 
         private void Awake()
         {
@@ -33,6 +35,11 @@ namespace Services
         internal static T GetService<T>()
         {
             return _container.GetService<T>();
+        }
+
+        private void OnValidate()
+        {
+            _installers = GetComponentsInChildren<MonoInstaller>();
         }
     }
 }
