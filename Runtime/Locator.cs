@@ -1,16 +1,27 @@
+using System.Collections.Generic;
+
 namespace Services
 {
-    public class Locator
+    internal class Implementation<TService>
     {
-        private class Implementation<TService>
+        public static TService serviceInstance;
+    }
+
+    public class LocatorContainer:IServiceContainer
+    {
+        private readonly List<object> _services = new();
+
+        internal IReadOnlyList<object> Services => _services;
+
+        public void RegisterSingle<TService>(TService service)
         {
-            public static TService serviceInstance;
+            Implementation<TService>.serviceInstance = service;
+            _services.Add(service);
         }
 
-        public void RegisterSingle<TService>(TService service) => 
-            Implementation<TService>.serviceInstance = service;
-
-        public static TService Single<TService>() =>
+        public TService Single<TService>() =>
             Implementation<TService>.serviceInstance;
+        
+        
     }
 }

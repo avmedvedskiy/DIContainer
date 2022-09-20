@@ -4,6 +4,6 @@ namespace Services
 {
     public abstract class MonoInstaller : MonoBehaviour
     {
-        public abstract void InstallBindings(IServiceRegister container);
+        public abstract void InstallBindings(IServiceContainer container);
     }
 }

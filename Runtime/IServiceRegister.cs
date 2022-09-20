@@ -1,7 +1,8 @@
 namespace Services
 {
-    public interface IServiceRegister
+    public interface IServiceContainer
     {
         void RegisterSingle<TService>(TService service);
+        TService Single<TService>();
     }
 }

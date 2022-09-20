@@ -5,12 +5,11 @@ using UnityEngine;
 namespace Services
 {
     [DefaultExecutionOrder(-1000)]
-    public sealed class ProjectContext : MonoBehaviour, IServiceRegister
+    public sealed class ProjectContext : MonoBehaviour
     {
         [SerializeField] private MonoInstaller[] _installers = { };
 
-        private readonly Locator _locator = new();
-        private readonly List<object> _services = new();
+        private readonly LocatorContainer _locator = new();
 
         private void Awake()
         {
@@ -19,9 +18,9 @@ namespace Services
 
         private void Start()
         {
-            foreach (var service in _services)
+            foreach (var service in _locator.Services)
             {
-                if(service is IInitialize initializedService)
+                if (service is IInitialize initializedService)
                     initializedService.Initialize();
             }
         }
@@ -29,15 +28,8 @@ namespace Services
         private void InstallBindings()
         {
             foreach (var monoInstaller in _installers)
-                monoInstaller.InstallBindings(this);
+                monoInstaller.InstallBindings(_locator);
         }
-
-        public void RegisterSingle<TService>(TService service)
-        {
-            _locator.RegisterSingle(service);
-            _services.Add(service);
-        }
-
 
         private void OnValidate()
         {
