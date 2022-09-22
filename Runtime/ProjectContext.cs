@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Services
 {
@@ -6,21 +7,17 @@ namespace Services
     public sealed class ProjectContext : MonoBehaviour
     {
         [SerializeField] private MonoInstaller[] _installers = { };
-
         private readonly LocatorContainer _locator = new();
+        private static bool _isInit;
 
         private void Awake()
         {
+            if (_isInit)
+                throw new Exception("ProjectContext already init");
+            
             InstallBindings();
-        }
-
-        private void Start()
-        {
-            foreach (var service in _locator.Services)
-            {
-                if (service is IInitialize initializedService)
-                    initializedService.Initialize();
-            }
+            DontDestroyOnLoad(gameObject);
+            _isInit = true;
         }
 
         private void InstallBindings()
