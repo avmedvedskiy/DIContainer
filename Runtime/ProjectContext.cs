@@ -7,23 +7,22 @@ namespace Services
     public sealed class ProjectContext : MonoBehaviour
     {
         [SerializeField] private MonoInstaller[] _installers = { };
-        private readonly LocatorContainer _locator = new();
-        private static bool _isInit;
+        internal static DependencyContainer Container { get; private set; }
 
         private void Awake()
         {
-            if (_isInit)
+            if (Container != null)
                 throw new Exception("ProjectContext already init");
-            
+
+            Container = new DependencyContainer();
             InstallBindings();
             DontDestroyOnLoad(gameObject);
-            _isInit = true;
         }
 
         private void InstallBindings()
         {
             foreach (var monoInstaller in _installers)
-                monoInstaller.InstallBindings(_locator);
+                monoInstaller.InstallBindings(Container);
         }
 
         private void OnValidate()

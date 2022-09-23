@@ -1,8 +1,17 @@
 namespace Services
 {
-    public interface IServiceContainer
+    public interface IDependencyContainer
     {
-        void RegisterSingle<TService>(TService service);
-        TService Single<TService>();
+        TService Resolve<TService>();
+        IDependencyImplementation<T> Bind<T>();
+    }
+
+    public interface IDependencyImplementation<in T>
+    {
+        void AsSingle(T implementation);
+
+        void AsSingle<TClass>() where TClass : T, new();
+
+        void AsTransient<TClass>() where TClass : T, new();
     }
 }
