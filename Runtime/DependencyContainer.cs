@@ -4,12 +4,13 @@ namespace Services
 {
     internal class DependencyContainer : IDependencyContainer
     {
-        public IDependencyImplementation<T> Bind<T>() => new ImplementationContainer<T>();
+        public IDependencyImplementation<T> Bind<T>() =>
+            new ImplementationContainer<T>();
 
         public T Resolve<T>() =>
             Implementation<T>.Instance;
     }
-    
+
     internal readonly struct ImplementationContainer<T> : IDependencyImplementation<T>
     {
         public void AsSingle(T implementation) =>
@@ -26,7 +27,7 @@ namespace Services
     {
         private static T _instance;
         private static Func<T> _instanceCreation;
-        private static bool _single;
+        private static bool _single = true;
 
         public static void AsSingle(T implementation)
         {
