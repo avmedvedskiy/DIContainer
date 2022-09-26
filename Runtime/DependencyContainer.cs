@@ -1,53 +1,143 @@
-using System;
+using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace Services
 {
-    internal class DependencyContainer : IDependencyContainer
+    public class DependencyContainer
     {
-        public IDependencyImplementation<T> Bind<T>() =>
-            new ImplementationContainer<T>();
+        public ContractType<T> Bind<T>() => new();
+
+        public ConcreteType<T, T> BindSelf<T>() where T : new() => new();
+        public void BindInstance<T>(T instance) => new ContractType<T>().FromInstance(instance);
 
         public T Resolve<T>() =>
-            Implementation<T>.Instance;
+            ImplementationResolver<T>.Instance;
     }
 
-    internal readonly struct ImplementationContainer<T> : IDependencyImplementation<T>
+    public readonly struct ContractType<T>
     {
-        public void AsSingle(T implementation) =>
-            Implementation<T>.AsSingle(implementation);
+        public void FromInstance(T implementation)
+        {
+            ImplementationResolver<T>.Set(new SingleImplementation<T>(implementation));
+        }
 
-        public void AsSingle<TClass>() where TClass : T, new() =>
-            Implementation<T>.AsSingle<TClass>();
+        public ConcretePrefabType<T, TComponent> FromComponentInNewPrefab<TComponent>(TComponent prefab)
+            where TComponent : Component
+        {
+            return new ConcretePrefabType<T, TComponent>(prefab);
+        }
 
-        public void AsTransient<TClass>() where TClass : T, new() =>
-            Implementation<T>.AsTransient<TClass>();
+        public ConcretePrefabType<T, TComponent> FromComponentInNewPrefab<TComponent>(GameObject prefab)
+            where TComponent : Component
+        {
+            return new ConcretePrefabType<T, TComponent>(prefab.GetComponent<TComponent>());
+        }
+
+        public ConcreteType<T, TClass> To<TClass>() where TClass : T, new()
+        {
+            return new ConcreteType<T, TClass>();
+        }
     }
 
-    internal static class Implementation<T>
+    public readonly struct ConcretePrefabType<TInterface, TComponent> where TComponent : Component
     {
-        private static T _instance;
-        private static Func<T> _instanceCreation;
-        private static bool _single = true;
+        private readonly TComponent _prefab;
 
-        public static void AsSingle(T implementation)
+        public ConcretePrefabType(TComponent prefab)
         {
-            _single = true;
-            _instance = implementation;
+            _prefab = prefab;
         }
 
-        public static void AsSingle<TClass>() where TClass : T, new()
+        public void AsSingle()
         {
-            _single = true;
-            _instance = new TClass();
+            ImplementationResolver<TInterface>.Set(
+                new SinglePrefabImplementation<TComponent>(_prefab) as IImplementation<TInterface>);
         }
 
-        public static void AsTransient<TClass>() where TClass : T, new()
+        public void AsTransient()
         {
-            _single = false;
-            _instanceCreation = () => new TClass();
+            ImplementationResolver<TInterface>.Set(
+                new TransientPrefabImplementation<TComponent>(_prefab) as IImplementation<TInterface>);
+        }
+    }
+
+    public readonly struct ConcreteType<TInterface, TClass> where TClass : TInterface, new()
+    {
+        public void AsSingle()
+        {
+            ImplementationResolver<TInterface>.Set(
+                new SingleImplementation<TClass>(new TClass()) as IImplementation<TInterface>);
+        }
+
+        public void AsTransient()
+        {
+            ImplementationResolver<TInterface>.Set(
+                new TransientImplementation<TClass>() as IImplementation<TInterface>);
+        }
+    }
+
+
+    internal static class ImplementationResolver<T>
+    {
+        private static IImplementation<T> _implementation;
+
+        public static void Set(IImplementation<T> implementation)
+        {
+            _implementation = implementation;
         }
 
         public static T Instance =>
-            _single ? _instance : _instanceCreation.Invoke();
+            _implementation == null ? default : _implementation.Instance;
+    }
+
+    internal interface IImplementation<out T>
+    {
+        T Instance { get; }
+    }
+
+    internal readonly struct SingleImplementation<T> : IImplementation<T>
+    {
+        public T Instance { get; }
+
+        public SingleImplementation(T instance)
+        {
+            Instance = instance;
+        }
+    }
+
+    internal readonly struct TransientImplementation<T> : IImplementation<T> where T : new()
+    {
+        public T Instance => new();
+    }
+
+    internal readonly struct SinglePrefabImplementation<T> : IImplementation<T> where T : Component
+    {
+        public SinglePrefabImplementation(T prefab)
+        {
+            Instance = Object.Instantiate(prefab);
+            Object.DontDestroyOnLoad(Instance.gameObject);
+        }
+
+        public T Instance { get; }
+    }
+
+    internal readonly struct TransientPrefabImplementation<T> : IImplementation<T> where T : Component
+    {
+        private readonly T _prefab;
+
+        public TransientPrefabImplementation(T prefab)
+        {
+            _prefab = prefab;
+        }
+
+        public T Instance
+        {
+            get
+            {
+                var instance = Object.Instantiate(_prefab);
+                Object.DontDestroyOnLoad(instance.gameObject);
+                return instance;
+            }
+        }
     }
 }
