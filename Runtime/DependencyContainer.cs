@@ -1,5 +1,4 @@
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Services
 {
@@ -63,10 +62,11 @@ namespace Services
 
     public readonly struct ConcreteType<TInterface, TClass> where TClass : TInterface, new()
     {
-        public void AsSingle()
+        public ConcreteLazyType<TInterface, TClass> AsSingle()
         {
             ImplementationResolver<TInterface>.Set(
-                new SingleImplementation<TClass>(new TClass()) as IImplementation<TInterface>);
+                new LazySingleImplementation<TClass>() as IImplementation<TInterface>);
+            return new ConcreteLazyType<TInterface, TClass>();
         }
 
         public void AsTransient()
@@ -76,68 +76,12 @@ namespace Services
         }
     }
 
-
-    internal static class ImplementationResolver<T>
+    public readonly struct ConcreteLazyType<TInterface, TClass> where TClass : TInterface, new()
     {
-        private static IImplementation<T> _implementation;
-
-        public static void Set(IImplementation<T> implementation)
+        public void NonLazy()
         {
-            _implementation = implementation;
-        }
-
-        public static T Instance =>
-            _implementation == null ? default : _implementation.Instance;
-    }
-
-    internal interface IImplementation<out T>
-    {
-        T Instance { get; }
-    }
-
-    internal readonly struct SingleImplementation<T> : IImplementation<T>
-    {
-        public T Instance { get; }
-
-        public SingleImplementation(T instance)
-        {
-            Instance = instance;
-        }
-    }
-
-    internal readonly struct TransientImplementation<T> : IImplementation<T> where T : new()
-    {
-        public T Instance => new();
-    }
-
-    internal readonly struct SinglePrefabImplementation<T> : IImplementation<T> where T : Component
-    {
-        public SinglePrefabImplementation(T prefab)
-        {
-            Instance = Object.Instantiate(prefab);
-            Object.DontDestroyOnLoad(Instance.gameObject);
-        }
-
-        public T Instance { get; }
-    }
-
-    internal readonly struct TransientPrefabImplementation<T> : IImplementation<T> where T : Component
-    {
-        private readonly T _prefab;
-
-        public TransientPrefabImplementation(T prefab)
-        {
-            _prefab = prefab;
-        }
-
-        public T Instance
-        {
-            get
-            {
-                var instance = Object.Instantiate(_prefab);
-                Object.DontDestroyOnLoad(instance.gameObject);
-                return instance;
-            }
+            ImplementationResolver<TInterface>.Set(
+                new SingleImplementation<TClass>(new TClass()) as IImplementation<TInterface>);
         }
     }
 }
