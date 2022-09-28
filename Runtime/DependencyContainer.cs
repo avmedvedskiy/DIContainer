@@ -7,7 +7,6 @@ namespace Services
         public ContractType<T> Bind<T>() => new();
 
         public ConcreteType<T, T> BindSelf<T>() where T : new() => new();
-        public void BindInstance<T>(T instance) => new ContractType<T>().FromInstance(instance);
 
         public T Resolve<T>() =>
             ImplementationResolver<T>.Instance;
