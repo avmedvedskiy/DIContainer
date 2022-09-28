@@ -4,40 +4,40 @@ namespace Services
 {
     public class DependencyContainer
     {
-        public ContractType<T> Bind<T>() => new();
+        public ContractType<TContact> Bind<TContact>() => new();
 
-        public ConcreteType<T, T> BindSelf<T>() where T : new() => new();
+        public ConcreteType<TConcrete, TConcrete> BindSelf<TConcrete>() where TConcrete : new() => new();
 
-        public T Resolve<T>() =>
-            ImplementationResolver<T>.Instance;
+        public TContract Resolve<TContract>() =>
+            ImplementationResolver<TContract>.Instance;
     }
 
-    public readonly struct ContractType<T>
+    public readonly struct ContractType<TContract>
     {
-        public void FromInstance(T implementation)
+        public void FromInstance(TContract implementation)
         {
-            ImplementationResolver<T>.Set(new SingleImplementation<T>(implementation));
+            ImplementationResolver<TContract>.Set(new SingleImplementation<TContract>(implementation));
         }
 
-        public ConcretePrefabType<T, TComponent> FromComponentInNewPrefab<TComponent>(TComponent prefab)
+        public ConcretePrefabType<TContract, TComponent> FromComponentInNewPrefab<TComponent>(TComponent prefab)
             where TComponent : Component
         {
-            return new ConcretePrefabType<T, TComponent>(prefab);
+            return new ConcretePrefabType<TContract, TComponent>(prefab);
         }
 
-        public ConcretePrefabType<T, TComponent> FromComponentInNewPrefab<TComponent>(GameObject prefab)
+        public ConcretePrefabType<TContract, TComponent> FromComponentInNewPrefab<TComponent>(GameObject prefab)
             where TComponent : Component
         {
-            return new ConcretePrefabType<T, TComponent>(prefab.GetComponent<TComponent>());
+            return new ConcretePrefabType<TContract, TComponent>(prefab.GetComponent<TComponent>());
         }
 
-        public ConcreteType<T, TClass> To<TClass>() where TClass : T, new()
+        public ConcreteType<TContract, TClass> To<TClass>() where TClass : TContract, new()
         {
-            return new ConcreteType<T, TClass>();
+            return new ConcreteType<TContract, TClass>();
         }
     }
 
-    public readonly struct ConcretePrefabType<TInterface, TComponent> where TComponent : Component
+    public readonly struct ConcretePrefabType<TContract, TComponent> where TComponent : Component
     {
         private readonly TComponent _prefab;
 
@@ -48,39 +48,39 @@ namespace Services
 
         public void AsSingle()
         {
-            ImplementationResolver<TInterface>.Set(
-                new SinglePrefabImplementation<TComponent>(_prefab) as IImplementation<TInterface>);
+            ImplementationResolver<TContract>.Set(
+                new SinglePrefabImplementation<TComponent>(_prefab) as IImplementation<TContract>);
         }
 
         public void AsTransient()
         {
-            ImplementationResolver<TInterface>.Set(
-                new TransientPrefabImplementation<TComponent>(_prefab) as IImplementation<TInterface>);
+            ImplementationResolver<TContract>.Set(
+                new TransientPrefabImplementation<TComponent>(_prefab) as IImplementation<TContract>);
         }
     }
 
-    public readonly struct ConcreteType<TInterface, TClass> where TClass : TInterface, new()
+    public readonly struct ConcreteType<TContract, TConcrete> where TConcrete : TContract, new()
     {
-        public ConcreteLazyType<TInterface, TClass> AsSingle()
+        public ConcreteLazyType<TContract, TConcrete> AsSingle()
         {
-            ImplementationResolver<TInterface>.Set(
-                new LazySingleImplementation<TClass>() as IImplementation<TInterface>);
-            return new ConcreteLazyType<TInterface, TClass>();
+            ImplementationResolver<TContract>.Set(
+                new LazySingleImplementation<TConcrete>() as IImplementation<TContract>);
+            return new ConcreteLazyType<TContract, TConcrete>();
         }
 
         public void AsTransient()
         {
-            ImplementationResolver<TInterface>.Set(
-                new TransientImplementation<TClass>() as IImplementation<TInterface>);
+            ImplementationResolver<TContract>.Set(
+                new TransientImplementation<TConcrete>() as IImplementation<TContract>);
         }
     }
 
-    public readonly struct ConcreteLazyType<TInterface, TClass> where TClass : TInterface, new()
+    public readonly struct ConcreteLazyType<TContract, TConcrete> where TConcrete : TContract, new()
     {
         public void NonLazy()
         {
-            ImplementationResolver<TInterface>.Set(
-                new SingleImplementation<TClass>(new TClass()) as IImplementation<TInterface>);
+            ImplementationResolver<TContract>.Set(
+                new SingleImplementation<TConcrete>(new TConcrete()) as IImplementation<TContract>);
         }
     }
 }

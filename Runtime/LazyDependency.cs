@@ -1,8 +1,8 @@
 namespace Services
 {
-    public struct LazyDependency<T>
+    public struct LazyDependency<TContract>
     {
-        private T _value;
-        public T Value => _value ??= Dependency.Resolve<T>();
+        private TContract _value;
+        public TContract Value => _value ??= Dependency.Resolve<TContract>();
     }
 }
