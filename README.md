@@ -1,6 +1,6 @@
 # Introduction 
 
-Light-weight container for dynamically providing objects with the dependencies they need. The library is based on the Service Locator pattern.
+Light-weight container for dynamically providing objects with the dependencies they need.
 ## Register Mappings to the Container
 ProjectContext - contains container and provide way to bind services via Installers. 
 
