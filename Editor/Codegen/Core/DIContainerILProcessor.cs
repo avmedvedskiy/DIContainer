@@ -69,10 +69,6 @@ namespace DI.Codegen
             var peStream = new MemoryStream(compiledAssembly.InMemoryAssembly.PeData.ToArray());
             var assemblyDefinition = AssemblyDefinition.ReadAssembly(peStream, readerParameters);
 
-            //apparently, it will happen that when we ask to resolve a type that lives inside UniMob, and we
-            //are also postprocessing UniMob, type resolving will fail, because we do not actually try to resolve
-            //inside the assembly we are processing. Let's make sure we do that, so that we can use postprocessor features inside
-            //UniMob itself as well.
             resolver.AddAssemblyDefinitionBeingOperatedOn(assemblyDefinition);
 
             return assemblyDefinition;
