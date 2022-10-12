@@ -33,8 +33,8 @@ After set a conctere type set a Scope
 ## Resolve
 For Resolve use InjectAttribute for fields and properties(lazy initialization after first using)
 ```csharp
-[Inject] private IStateMachine Machine { get; }
-[Inject] private readonly StoriesService _storiesService;
+[Inject] private IStateMachine Machine { get; } //will be inited when first use
+[Inject] private readonly StoriesService _storiesService; //will be inited in constructor
 ```
 
 ## Example
