@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Services
+namespace DI
 {
     internal interface IImplementation<out T>
     {

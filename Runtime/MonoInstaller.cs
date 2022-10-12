@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Services
+namespace DI
 {
     public abstract class MonoInstaller : MonoBehaviour
     {

@@ -1,4 +1,4 @@
-namespace Services
+namespace DI
 {
     internal static class ImplementationResolver<T>
     {

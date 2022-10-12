@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Services
+namespace DI
 {
     [DefaultExecutionOrder(-1000)]
     public sealed class ProjectContext : MonoBehaviour

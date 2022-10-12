@@ -1,4 +1,4 @@
-namespace Services
+namespace DI
 {
     public static class Dependency
     {
