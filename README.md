@@ -31,12 +31,10 @@ After set a conctere type set a Scope
 - <b>AsTransient</b> - Every time ContractType is requested, the container will execute the given construction method again
 
 ## Resolve
-For Resolve use Dependency and LazyDependency<TContract> classes
+For Resolve use InjectAttribute for fields and properties(lazy initialization after first using)
 ```csharp
-var machine = Dependency.Resolve<IStateMachine>();
-
-LazyDependency<IStateMachine> _stateMachine;
-_stateMachine.Value //getting service
+[Inject] private IStateMachine Machine { get; }
+[Inject] private readonly StoriesService _storiesService;
 ```
 
 ## Example
