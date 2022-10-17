@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 using Editor;
 using Mono.Cecil;
 using Mono.Cecil.Rocks;
@@ -33,12 +35,32 @@ namespace DI.Codegen
                 {
                     isChanged |= Process(type, field);
                 }
+
+                foreach (var method in type.Methods)
+                {
+                    isChanged |= Process(type, method);
+                }
             }
 
             return diagnosticMessages;
         }
 
-        bool Process(TypeDefinition typeDefinition, PropertyDefinition propertyDefinition)
+        private bool Process(TypeDefinition typeDefinition, MethodDefinition methodDefinition)
+        {
+            //temporary not used
+
+            var injectAttribute = Helpers.GetCustomAttribute<InjectAttribute>(methodDefinition);
+            if (injectAttribute == null)
+            {
+                return false;
+            }
+
+            Console.WriteLine($"Custom Method Attribute {methodDefinition.Name}");
+            new InjectInMethod(typeDefinition, methodDefinition).Process();
+            return true;
+        }
+
+        private bool Process(TypeDefinition typeDefinition, PropertyDefinition propertyDefinition)
         {
             var injectAttribute = Helpers.GetCustomAttribute<InjectAttribute>(propertyDefinition);
             if (injectAttribute == null)
@@ -47,12 +69,12 @@ namespace DI.Codegen
             }
 
 
-            Console.WriteLine($"Custom Attribute {propertyDefinition.Name}");
+            Console.WriteLine($"Custom Property Attribute {propertyDefinition.Name}");
             new InjectPropertyGetterMethod(typeDefinition, propertyDefinition).Process();
             return true;
         }
 
-        bool Process(TypeDefinition typeDefinition, FieldDefinition fieldDefinition)
+        private bool Process(TypeDefinition typeDefinition, FieldDefinition fieldDefinition)
         {
             var injectAttribute = Helpers.GetCustomAttribute<InjectAttribute>(fieldDefinition);
             if (injectAttribute == null)
@@ -60,7 +82,7 @@ namespace DI.Codegen
                 return false;
             }
 
-            Console.WriteLine($"Custom Field {fieldDefinition.Name}");
+            Console.WriteLine($"Custom Field Attribute {fieldDefinition.Name}");
             new InjectFieldGetterMethod(typeDefinition, fieldDefinition).Process();
             return true;
         }

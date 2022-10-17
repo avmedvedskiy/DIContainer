@@ -58,4 +58,31 @@ namespace DI
             }
         }
     }
+
+
+    internal struct SingleLazyGameObjectImplementation<T> : IImplementation<T> where T : Component
+    {
+        private T _instance;
+
+        T Create()
+        {
+            GameObject go = new GameObject(typeof(T).Name);
+            Object.DontDestroyOnLoad(go);
+            return go.AddComponent<T>();
+        }
+        public T Instance => _instance ??= Create();
+    }
+
+    internal readonly struct TransientGameObjectImplementation<T> : IImplementation<T> where T : Component
+    {
+        public T Instance
+        {
+            get
+            {
+                GameObject go = new GameObject(typeof(T).Name);
+                Object.DontDestroyOnLoad(go);
+                return go.AddComponent<T>();
+            }
+        }
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reflection;
 using Editor;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
@@ -19,8 +20,9 @@ namespace DI.Codegen
             var moduleDefinition = fieldDefinition.Module;
 
             _getServiceMethodReference = Helpers.MakeGenericMethod(
-                moduleDefinition.ImportReference(typeof(Dependency).GetMethod("Resolve")),
-                new[] { fieldDefinition.FieldType });
+                moduleDefinition.ImportReference(typeof(Dependency).GetMethod("Resolve",
+                    BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)),
+                fieldDefinition.FieldType);
         }
 
         public void Process()

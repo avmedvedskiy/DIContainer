@@ -38,12 +38,11 @@ namespace DI.Codegen
 
             CreateBackingField();
 
-            foreach (var instruction in instructions)
-            {
-                Console.WriteLine(instruction);
-            }
-
-            Console.WriteLine("NEW LINE " + _propertyDefinition.PropertyType);
+            //foreach (var instruction in instructions)
+            //{
+            //    Console.WriteLine(instruction);
+            //}
+            //Console.WriteLine("NEW LINE " + _propertyDefinition.PropertyType);
 
             instructions.Clear();
             var returnInstruction = Instruction.Create(OpCodes.Ret);
@@ -66,10 +65,10 @@ namespace DI.Codegen
 
             getMethodDefinition.Body.OptimizeMacros();
 
-            foreach (var instruction in instructions)
-            {
-                Console.WriteLine(instruction);
-            }
+            //foreach (var instruction in instructions)
+            //{
+            //    Console.WriteLine(instruction);
+            //}
 
             //simple return
             //instructions.Add(Instruction.Create(OpCodes.Call, _getServiceMethodReference));
