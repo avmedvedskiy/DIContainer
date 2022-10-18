@@ -4,9 +4,11 @@ namespace DI
 {
     public class DependencyContainer
     {
-        public ContractType<TContact> Bind<TContact>() => new();
+        public ContractType<TContact> Bind<TContact>() => 
+            new();
 
-        public ConcreteType<TConcrete, TConcrete> BindSelf<TConcrete>() where TConcrete : new() => new();
+        public ConcreteType<TConcrete, TConcrete> BindSelf<TConcrete>() where TConcrete : new() => 
+            new();
 
         public TContract Resolve<TContract>() =>
             ImplementationResolver<TContract>.Instance;
@@ -14,10 +16,8 @@ namespace DI
 
     public readonly struct ContractType<TContract>
     {
-        public void FromInstance(TContract implementation)
-        {
+        public void FromInstance(TContract implementation) => 
             ImplementationResolver<TContract>.Set(new SingleImplementation<TContract>(implementation));
-        }
 
         public ConcretePrefabType<TContract, TComponent> FromComponentInNewPrefab<TComponent>(TComponent prefab)
             where TComponent : Component
@@ -110,7 +110,7 @@ namespace DI
         public void NonLazy()
         {
             ImplementationResolver<TContract>.Set(
-                new SingleImplementation<TConcrete>(new TConcrete()) as IImplementation<TContract>);
+                new SingleImplementation<TConcrete>(Factory.Create<TConcrete>()) as IImplementation<TContract>);
         }
     }
 }

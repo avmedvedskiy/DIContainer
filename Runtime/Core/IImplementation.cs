@@ -20,20 +20,19 @@ namespace DI
     internal struct LazySingleImplementation<T> : IImplementation<T> where T : new()
     {
         private T _instance;
-        public T Instance => _instance ??= new T();
+        public T Instance => _instance ??= Factory.Create<T>();
     }
 
     internal readonly struct TransientImplementation<T> : IImplementation<T> where T : new()
     {
-        public T Instance => new();
+        public T Instance => Factory.Create<T>();
     }
 
     internal readonly struct SinglePrefabImplementation<T> : IImplementation<T> where T : Component
     {
         public SinglePrefabImplementation(T prefab)
         {
-            Instance = Object.Instantiate(prefab);
-            Object.DontDestroyOnLoad(Instance.gameObject);
+            Instance = Factory.CreateFromPrefab(prefab);
         }
 
         public T Instance { get; }
@@ -48,41 +47,18 @@ namespace DI
             _prefab = prefab;
         }
 
-        public T Instance
-        {
-            get
-            {
-                var instance = Object.Instantiate(_prefab);
-                Object.DontDestroyOnLoad(instance.gameObject);
-                return instance;
-            }
-        }
+        public T Instance => Factory.CreateFromPrefab(_prefab);
     }
 
 
     internal struct SingleLazyGameObjectImplementation<T> : IImplementation<T> where T : Component
     {
         private T _instance;
-
-        T Create()
-        {
-            GameObject go = new GameObject(typeof(T).Name);
-            Object.DontDestroyOnLoad(go);
-            return go.AddComponent<T>();
-        }
-        public T Instance => _instance ??= Create();
+        public T Instance => _instance ??= Factory.CreateNewGameObject<T>();
     }
 
     internal readonly struct TransientGameObjectImplementation<T> : IImplementation<T> where T : Component
     {
-        public T Instance
-        {
-            get
-            {
-                GameObject go = new GameObject(typeof(T).Name);
-                Object.DontDestroyOnLoad(go);
-                return go.AddComponent<T>();
-            }
-        }
+        public T Instance => Factory.CreateNewGameObject<T>();
     }
 }

@@ -43,7 +43,6 @@ namespace DI.Codegen
             }
 
             _methodDefinition.Body.OptimizeMacros();
-            _typeDefinition.Methods.Remove(_methodDefinition);
         }
     }
 }
