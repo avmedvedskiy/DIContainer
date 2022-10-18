@@ -8,6 +8,7 @@ namespace DI
         {
             T result = new T();
             return result;
+            
             //var constructorInfo = typeof(T).GetConstructors()[0];
             //T result = (T)constructorInfo.Invoke(new object[constructorInfo.GetParameters().Length]);
             //return result;
