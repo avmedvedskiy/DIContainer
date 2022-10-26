@@ -20,19 +20,19 @@ namespace DI
             ImplementationResolver<TContract>.Set(new SingleImplementation<TContract>(implementation));
 
         public ConcretePrefabType<TContract, TComponent> FromComponentInNewPrefab<TComponent>(TComponent prefab)
-            where TComponent : Component
+            where TComponent : Component,TContract
         {
             return new ConcretePrefabType<TContract, TComponent>(prefab);
         }
 
         public ConcretePrefabType<TContract, TComponent> FromComponentInNewPrefab<TComponent>(GameObject prefab)
-            where TComponent : Component
+            where TComponent : Component,TContract
         {
             return new ConcretePrefabType<TContract, TComponent>(prefab.GetComponent<TComponent>());
         }
 
         public ConcreteGameObjectType<TContract, TComponent> FromComponentInNewGameObject<TComponent>()
-            where TComponent : Component
+            where TComponent : Component, TContract
         {
             return new ConcreteGameObjectType<TContract, TComponent>();
         }

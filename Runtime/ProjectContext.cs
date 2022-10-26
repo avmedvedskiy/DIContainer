@@ -15,8 +15,15 @@ namespace DI
                 throw new Exception("ProjectContext already init");
 
             Container = new DependencyContainer();
+            InstallDefaultBindings();
             InstallBindings();
             DontDestroyOnLoad(gameObject);
+        }
+
+        private void InstallDefaultBindings()
+        {
+            Container.Bind<ITickableManager>().FromComponentInNewGameObject<TickableManager>().AsSingle().NonLazy();
+            Container.Bind<IPauseManager>().FromComponentInNewGameObject<PauseManager>().AsSingle().NonLazy();
         }
 
         private void InstallBindings()
