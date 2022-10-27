@@ -9,7 +9,6 @@ namespace DI
             _implementation = implementation;
         }
 
-        public static T Instance =>
-            _implementation == null ? default : _implementation.Instance;
+        public static T Instance => _implementation.Instance;
     }
 }
