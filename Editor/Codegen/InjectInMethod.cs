@@ -1,5 +1,3 @@
-using System.Reflection;
-using Editor;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
@@ -28,10 +26,7 @@ namespace DI.Codegen
             instructions.Add(Instruction.Create(OpCodes.Nop));
             foreach (var parameterDefinition in _methodDefinition.Parameters)
             {
-                var resolveMethod = Helpers.MakeGenericMethod(
-                    _moduleDefinition.ImportReference(typeof(Dependency).GetMethod("Resolve",
-                        BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)),
-                    parameterDefinition.ParameterType);
+                var resolveMethod = _moduleDefinition.GetDependencyResolveMethod(parameterDefinition.ParameterType);
 
                 instructions.Add(Instruction.Create(OpCodes.Call, resolveMethod));
                 instructions.Add(Instruction.Create(OpCodes.Starg_S, parameterDefinition));
