@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using Editor;
 using Mono.Cecil;
 using Mono.Cecil.Rocks;
 using Unity.CompilationPipeline.Common.Diagnostics;
@@ -47,9 +44,7 @@ namespace DI.Codegen
 
         private bool Process(TypeDefinition typeDefinition, MethodDefinition methodDefinition)
         {
-            //temporary not used
-
-            var injectAttribute = Helpers.GetCustomAttribute<InjectAttribute>(methodDefinition);
+            var injectAttribute = methodDefinition.GetCustomAttribute<InjectAttribute>();
             if (injectAttribute == null)
             {
                 return false;
@@ -62,21 +57,20 @@ namespace DI.Codegen
 
         private bool Process(TypeDefinition typeDefinition, PropertyDefinition propertyDefinition)
         {
-            var injectAttribute = Helpers.GetCustomAttribute<InjectAttribute>(propertyDefinition);
+            var injectAttribute = propertyDefinition.GetCustomAttribute<InjectAttribute>();
             if (injectAttribute == null)
             {
                 return false;
             }
 
-
             Console.WriteLine($"Custom Property Attribute {propertyDefinition.Name}");
-            new InjectPropertyGetterMethod(typeDefinition, propertyDefinition).Process();
+            new InjectPropertyLazyGetterMethod(typeDefinition, propertyDefinition).Process();
             return true;
         }
 
         private bool Process(TypeDefinition typeDefinition, FieldDefinition fieldDefinition)
         {
-            var injectAttribute = Helpers.GetCustomAttribute<InjectAttribute>(fieldDefinition);
+            var injectAttribute = fieldDefinition.GetCustomAttribute<InjectAttribute>();
             if (injectAttribute == null)
             {
                 return false;

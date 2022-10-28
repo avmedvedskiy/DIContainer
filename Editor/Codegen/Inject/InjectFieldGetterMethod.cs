@@ -1,6 +1,4 @@
 ﻿using System.Linq;
-using System.Reflection;
-using Editor;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
@@ -19,10 +17,7 @@ namespace DI.Codegen
             _fieldDefinition = fieldDefinition;
             var moduleDefinition = fieldDefinition.Module;
 
-            _getServiceMethodReference = Helpers.MakeGenericMethod(
-                moduleDefinition.ImportReference(typeof(Dependency).GetMethod("Resolve",
-                    BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)),
-                fieldDefinition.FieldType);
+            _getServiceMethodReference = moduleDefinition.GetDependencyResolveMethod(fieldDefinition.FieldType);
         }
 
         public void Process()
@@ -34,11 +29,6 @@ namespace DI.Codegen
                 instructions.Insert(0, Instruction.Create(OpCodes.Stfld, _fieldDefinition));
                 instructions.Insert(0, Instruction.Create(OpCodes.Call, _getServiceMethodReference));
                 instructions.Insert(0, Instruction.Create(OpCodes.Ldarg_0));
-
-                //foreach (var instruction in instructions)
-                //{
-                //    Console.WriteLine(instruction);
-                //}
 
                 cctor.Body.OptimizeMacros();
             }

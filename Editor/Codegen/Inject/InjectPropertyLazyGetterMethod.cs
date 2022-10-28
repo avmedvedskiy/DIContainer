@@ -1,31 +1,26 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using Editor;
+﻿using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
+using Mono.Collections.Generic;
 using FieldAttributes = Mono.Cecil.FieldAttributes;
 
 namespace DI.Codegen
 {
-    internal class InjectPropertyGetterMethod
+    internal class InjectPropertyLazyGetterMethod
     {
         private readonly TypeDefinition _typeDefinition;
         private readonly PropertyDefinition _propertyDefinition;
         private readonly MethodReference _getServiceMethodReference;
         private FieldDefinition _backField;
 
-        public InjectPropertyGetterMethod(TypeDefinition typeDefinition, PropertyDefinition propertyDefinition)
+        public InjectPropertyLazyGetterMethod(TypeDefinition typeDefinition, PropertyDefinition propertyDefinition)
         {
             _typeDefinition = typeDefinition;
             _propertyDefinition = propertyDefinition;
             var moduleDefinition = propertyDefinition.Module;
 
-            _getServiceMethodReference = Helpers.MakeGenericMethod(
-                moduleDefinition.ImportReference(typeof(Dependency).GetMethod("Resolve",
-                    BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)),
-                propertyDefinition.PropertyType);
+            _getServiceMethodReference = moduleDefinition.GetDependencyResolveMethod(propertyDefinition.PropertyType);
         }
 
         public void Process()
@@ -34,15 +29,8 @@ namespace DI.Codegen
             //and change get method to _backFieldValue ??= Dependency.Resolve<T>
 
             var getMethodDefinition = _propertyDefinition.GetMethod;
-            var instructions = getMethodDefinition.Body.Instructions;
-
+            Collection<Instruction> instructions = getMethodDefinition.Body.Instructions;
             CreateBackingField();
-
-            //foreach (var instruction in instructions)
-            //{
-            //    Console.WriteLine(instruction);
-            //}
-            //Console.WriteLine("NEW LINE " + _propertyDefinition.PropertyType);
 
             instructions.Clear();
             var returnInstruction = Instruction.Create(OpCodes.Ret);
@@ -62,17 +50,7 @@ namespace DI.Codegen
             instructions.Add(Instruction.Create(OpCodes.Ldfld, _backField));
             instructions.Add(returnInstruction);
 
-
             getMethodDefinition.Body.OptimizeMacros();
-
-            //foreach (var instruction in instructions)
-            //{
-            //    Console.WriteLine(instruction);
-            //}
-
-            //simple return
-            //instructions.Add(Instruction.Create(OpCodes.Call, _getServiceMethodReference));
-            //instructions.Add(Instruction.Create(OpCodes.Ret));
         }
 
         private void CreateBackingField()
