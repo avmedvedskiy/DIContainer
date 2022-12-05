@@ -19,6 +19,7 @@ namespace DI
         public SingleImplementation(T instance)
         {
             Instance = instance;
+            Factory.RegisterToInternalInterfaces(instance);
         }
     }
 

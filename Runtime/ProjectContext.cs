@@ -11,9 +11,6 @@ namespace DI
 
         private void Awake()
         {
-            if (Container != null)
-                throw new Exception("ProjectContext already init");
-
             Container = new DependencyContainer();
             InstallDefaultBindings();
             InstallBindings();

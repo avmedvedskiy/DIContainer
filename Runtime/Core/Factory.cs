@@ -36,7 +36,7 @@ namespace DI
         }
 
 
-        private static void RegisterToInternalInterfaces<T>(T result)
+        internal static void RegisterToInternalInterfaces<T>(T result)
         {
             if (result is ITickable tickable)
                 TickableManager.AddListener(tickable);
