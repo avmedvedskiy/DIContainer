@@ -23,7 +23,7 @@ namespace DI.Codegen
                 return false;
             if (typeReference.FullName == typeof(MonoBehaviour).FullName)
                 return true;
-            return IsMonoBehaviourClass(typeReference.BaseType.Resolve());
+            return IsMonoBehaviourClass(typeReference.BaseType?.Resolve());
         }
     }
 }
