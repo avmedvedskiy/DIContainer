@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace DI
 {
-    [DefaultExecutionOrder(-1000)]
+    [DefaultExecutionOrder(-9999)]
     public sealed class ProjectContext : MonoBehaviour
     {
         [SerializeField] private MonoInstaller[] _installers = { };
