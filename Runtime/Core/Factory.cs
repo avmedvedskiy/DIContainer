@@ -38,11 +38,15 @@ namespace DI
 
         internal static void RegisterToInternalInterfaces<T>(T result)
         {
-            if (result is ITickable tickable)
-                TickableManager.AddListener(tickable);
-
-            if (result is IPausable pausable)
-                PauseManager.AddListener(pausable);
+            switch (result)
+            {
+                case ITickable tickable:
+                    TickableManager.AddListener(tickable);
+                    break;
+                case IPausable pausable:
+                    PauseManager.AddListener(pausable);
+                    break;
+            }
         }
     }
 }

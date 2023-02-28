@@ -1,4 +1,4 @@
-using System;
+using System.Runtime.CompilerServices;
 
 namespace DI
 {
@@ -6,6 +6,7 @@ namespace DI
     {
         private static IImplementation<T> _implementation = new DefaultImplementation<T>();
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Set(IImplementation<T> implementation)
         {
             _implementation = implementation;
