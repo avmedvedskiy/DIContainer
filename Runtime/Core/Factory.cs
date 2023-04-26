@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace DI
 {
@@ -13,9 +15,6 @@ namespace DI
             RegisterToInternalInterfaces(result);
             return result;
 
-            //var constructorInfo = typeof(T).GetConstructors()[0];
-            //T result = (T)constructorInfo.Invoke(new object[constructorInfo.GetParameters().Length]);
-            //return result;
         }
 
         internal static T CreateNewGameObject<T>() where T : Component
@@ -34,9 +33,22 @@ namespace DI
             RegisterToInternalInterfaces(result);
             return result;
         }
+        
+        internal static T CreateFromMethod<T>(Func<T> method)
+        {
+            T result = method.Invoke();
+            RegisterToInternalInterfaces(result);
+            return result;
+        }
+
+        internal static T FromInstance<T>(T instance)
+        {
+            RegisterToInternalInterfaces(instance);
+            return instance;
+        }
 
 
-        internal static void RegisterToInternalInterfaces<T>(T result)
+        static void RegisterToInternalInterfaces<T>(T result)
         {
             switch (result)
             {

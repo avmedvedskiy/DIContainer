@@ -4,6 +4,7 @@ namespace DI
 {
     public abstract class MonoInstaller : MonoBehaviour
     {
-        public abstract void InstallBindings(DependencyContainer container);
+        public DependencyContainer Container { get; internal set; }
+        public abstract void InstallBindings();
     }
 }

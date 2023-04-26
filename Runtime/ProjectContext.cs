@@ -26,7 +26,10 @@ namespace DI
         private void InstallBindings()
         {
             foreach (var monoInstaller in _installers)
-                monoInstaller.InstallBindings(Container);
+            {
+                monoInstaller.Container = Container;
+                monoInstaller.InstallBindings();
+            }
         }
 
         private void OnValidate()
