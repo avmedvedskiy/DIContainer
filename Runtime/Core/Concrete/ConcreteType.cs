@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace DI
 {
-    public readonly struct ConcreteType<TContract, TConcrete> where TConcrete : TContract, new()
+    public readonly struct ConcreteType<TContract, TConcrete> where TConcrete : TContract
     {
         public ConcreteLazyType<TContract, TConcrete> AsSingle()
         {
@@ -18,7 +18,7 @@ namespace DI
         }
     }
 
-    public readonly struct ConcreteLazyType<TContract, TConcrete> where TConcrete : TContract, new()
+    public readonly struct ConcreteLazyType<TContract, TConcrete> where TConcrete : TContract
     {
         public void NonLazy()
         {

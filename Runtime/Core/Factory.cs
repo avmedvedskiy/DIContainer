@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -9,12 +10,37 @@ namespace DI
         private static ITickableManager TickableManager => Dependency.Resolve<ITickableManager>();
         private static IPauseManager PauseManager => Dependency.Resolve<IPauseManager>();
 
-        internal static T Create<T>() where T : new()
+        private static readonly MethodInfo _resolveMethod;
+        private static readonly Type[] _resolveArguments;
+
+        static Factory()
         {
-            T result = new T();
+            Type type = typeof(Dependency);
+            _resolveMethod = type.GetMethod(nameof(Dependency.Resolve), BindingFlags.Static | BindingFlags.Public);
+            _resolveArguments = new Type[1];
+        }
+
+        internal static T Create<T>()
+        {
+            //T result = new T();
+            //RegisterToInternalInterfaces(result);
+            //return result;
+
+            var constructorInfo = typeof(T).GetConstructors()[0];
+            var parameters = constructorInfo.GetParameters();
+            var arguments = new object[parameters.Length];
+
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                var parameter = parameters[i];
+                _resolveArguments[0] = parameter.ParameterType;
+                MethodInfo genericMethodInfo = _resolveMethod.MakeGenericMethod(_resolveArguments);
+                arguments[i] = genericMethodInfo.Invoke(null, null);
+            }
+
+            T result = (T)constructorInfo.Invoke(arguments);
             RegisterToInternalInterfaces(result);
             return result;
-
         }
 
         internal static T CreateNewGameObject<T>() where T : Component
@@ -33,7 +59,7 @@ namespace DI
             RegisterToInternalInterfaces(result);
             return result;
         }
-        
+
         internal static T CreateFromMethod<T>(Func<T> method)
         {
             T result = method.Invoke();

@@ -7,7 +7,7 @@ namespace DI.Codegen
         public static MethodReference GetDependencyResolveMethod(this ModuleDefinition moduleDefinition,
             params TypeReference[] arguments)
         {
-            return moduleDefinition.FindGenericMethod(typeof(Dependency), "Resolve", arguments);
+            return moduleDefinition.FindGenericMethod(typeof(Dependency), nameof(Dependency.Resolve), arguments);
         }
     }
 }

@@ -31,7 +31,7 @@ namespace DI
             return new ConcreteGameObjectType<TContract, TComponent>();
         }
 
-        public ConcreteType<TContract, TClass> To<TClass>() where TClass : TContract, new()
+        public ConcreteType<TContract, TClass> To<TClass>() where TClass : TContract
         {
             return new ConcreteType<TContract, TClass>();
         }

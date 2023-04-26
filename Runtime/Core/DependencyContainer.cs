@@ -8,7 +8,7 @@ namespace DI
         public ContractType<TContact> Bind<TContact>() =>
             new();
 
-        public ConcreteType<TConcrete, TConcrete> BindSelf<TConcrete>() where TConcrete : new() =>
+        public ConcreteType<TConcrete, TConcrete> BindSelf<TConcrete>() =>
             new();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
