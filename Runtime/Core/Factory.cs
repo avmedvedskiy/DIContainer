@@ -9,16 +9,7 @@ namespace DI
     {
         private static ITickableManager TickableManager => Dependency.Resolve<ITickableManager>();
         private static IPauseManager PauseManager => Dependency.Resolve<IPauseManager>();
-
-        private static readonly MethodInfo _resolveMethod;
-        private static readonly Type[] _resolveArguments;
-
-        static Factory()
-        {
-            Type type = typeof(Dependency);
-            _resolveMethod = type.GetMethod(nameof(Dependency.Resolve), BindingFlags.Static | BindingFlags.Public);
-            _resolveArguments = new Type[1];
-        }
+        
 
         internal static T Create<T>()
         {
@@ -33,9 +24,7 @@ namespace DI
             for (int i = 0; i < parameters.Length; i++)
             {
                 var parameter = parameters[i];
-                _resolveArguments[0] = parameter.ParameterType;
-                MethodInfo genericMethodInfo = _resolveMethod.MakeGenericMethod(_resolveArguments);
-                arguments[i] = genericMethodInfo.Invoke(null, null);
+                arguments[i] = Dependency.ResolveByReflection(parameter.ParameterType);
             }
 
             T result = (T)constructorInfo.Invoke(arguments);
