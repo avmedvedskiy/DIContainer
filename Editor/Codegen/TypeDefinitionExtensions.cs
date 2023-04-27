@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Mono.Cecil;
 using UnityEngine;
@@ -17,13 +18,16 @@ namespace DI.Codegen
             return FindParentMethod(typeDefinition.BaseType?.Resolve(), methodName);
         }
 
-        public static bool IsMonoBehaviourClass(this TypeDefinition typeReference)
+        public static bool IsMonoBehaviourClass(this TypeDefinition typeReference) 
+            => IsNestedTypeOf(typeReference, typeof(MonoBehaviour));
+
+        public static bool IsNestedTypeOf(this TypeDefinition typeReference, Type type)
         {
             if (typeReference == null)
                 return false;
-            if (typeReference.FullName == typeof(MonoBehaviour).FullName)
+            if (typeReference.FullName == type.FullName)
                 return true;
-            return IsMonoBehaviourClass(typeReference.BaseType?.Resolve());
+            return IsNestedTypeOf(typeReference.BaseType?.Resolve(),type);
         }
     }
 }

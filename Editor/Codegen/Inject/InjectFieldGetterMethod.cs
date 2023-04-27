@@ -60,7 +60,7 @@ namespace DI.Codegen
                 instructions.Add(Instruction.Create(OpCodes.Nop));
                 instructions.Add(Instruction.Create(OpCodes.Ret));
                 methodDefinition.Body.OptimizeMacros();
-                instructions.Write();
+                //instructions.Write();
                 _typeDefinition.Methods.Add(methodDefinition);
             }
 

@@ -1,3 +1,4 @@
+using System;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
@@ -19,6 +20,8 @@ namespace DI.Codegen
 
         public void Process()
         {
+            Console.WriteLine($"Inject in Method class {_typeDefinition.FullName} {_methodDefinition.Name}");
+            
             var instructions = _methodDefinition.Body.Instructions;
             var oldInstructions = instructions.ToArray();
             instructions.Clear();

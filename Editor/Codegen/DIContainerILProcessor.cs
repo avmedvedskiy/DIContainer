@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
+using Mono.Cecil.Rocks;
 using Unity.CompilationPipeline.Common.Diagnostics;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
 
@@ -15,21 +15,24 @@ namespace DI.Codegen
         public override ILPostProcessor GetInstance() => this;
 
         public override bool WillProcess(ICompiledAssembly compiledAssembly)
-        {
-            return compiledAssembly.References.Any(f => Path.GetFileName(f) == "DIContainer.Runtime.dll");
-        }
+            => HasReferenceToContainer(compiledAssembly);
+
+        private bool HasReferenceToContainer(ICompiledAssembly compiledAssembly)
+            => compiledAssembly.References.Any(f => Path.GetFileName(f) == "DIContainer.Runtime.dll");
 
         public override ILPostProcessResult Process(ICompiledAssembly compiledAssembly)
         {
-            if (!WillProcess(compiledAssembly))
-            {
-                return null;
-            }
-
             var assemblyDefinition = AssemblyDefinitionFor(compiledAssembly);
-            var diagnostics = new List<DiagnosticMessage>();
+
+            if (!WillProcess(compiledAssembly))
+                return null;
+
+
             Console.WriteLine($"Start Processing = {assemblyDefinition.Name} ");
 
+            FindAllClassesThatUsedInContainer(assemblyDefinition);
+
+            var diagnostics = new List<DiagnosticMessage>();
             List<DiagnosticMessage> messages = new DIProcessor()
                 .Process(assemblyDefinition, out bool madeAnyChange);
 
@@ -53,6 +56,54 @@ namespace DI.Codegen
             return new ILPostProcessResult(new InMemoryAssembly(pe.ToArray(), pdb.ToArray()), diagnostics);
         }
 
+        private void FindAllClassesThatUsedInContainer(AssemblyDefinition assembly)
+        {
+            var methods = assembly
+                .Modules
+                .SelectMany(module => module.Types)
+                .Where(x => x.IsNestedTypeOf(typeof(MonoInstaller)))
+                .SelectMany(type => type.Methods)
+                .Where(method => method.HasBody)
+                .ToList();
+
+            foreach (var method in methods)
+            {
+                //Console.WriteLine($"Find methods {method.Name} {method.DeclaringType}");
+                //method.Body.Instructions.Write();
+
+                var methodReferences = GetCallsBind(method);
+                foreach (var reference in methodReferences)
+                {
+                    //Console.WriteLine($"Find class {((GenericInstanceMethod)reference).GenericArguments[0].Resolve().FullName}");
+                    var type = ((GenericInstanceMethod)reference).GenericArguments[0].Resolve();
+
+                    foreach (var ctor in type.Methods.Where(x => x.IsConstructor))
+                    {
+                        if(ctor.CustomAttributes.Any(x => x.AttributeType.Name == "InjectAttribute"))
+                            continue;
+                        
+                        if(!ctor.HasParameters)
+                            continue;
+                        
+                        var injectAttribute = assembly.MainModule.ImportReference(typeof(InjectAttribute));
+                        var attributeConstructor = injectAttribute.Resolve().GetConstructors().First().Resolve();
+                        var customAttribute =
+                            new CustomAttribute(assembly.MainModule.ImportReference(attributeConstructor));
+                        ctor.CustomAttributes.Add(customAttribute);
+                    }
+                }
+            }
+        }
+
+        private static IEnumerable<MethodReference> GetCallsBind(MethodDefinition method)
+        {
+            return method.Body.Instructions
+                .Where(instruction => instruction.OpCode == OpCodes.Callvirt || instruction.OpCode == OpCodes.Call)
+                .Select(instruction => (MethodReference)instruction.Operand)
+                .Where(methodReference => methodReference.FullName.Contains("::To") ||
+                                          methodReference.FullName.Contains("::BindSelf"));
+        }
+
 
         private AssemblyDefinition AssemblyDefinitionFor(ICompiledAssembly compiledAssembly)
         {
@@ -72,37 +123,6 @@ namespace DI.Codegen
             resolver.AddAssemblyDefinitionBeingOperatedOn(assemblyDefinition);
 
             return assemblyDefinition;
-        }
-    }
-
-
-    internal class PostProcessorReflectionImporterProvider : IReflectionImporterProvider
-    {
-        public IReflectionImporter GetReflectionImporter(ModuleDefinition module)
-        {
-            return new PostProcessorReflectionImporter(module);
-        }
-    }
-
-    internal class PostProcessorReflectionImporter : DefaultReflectionImporter
-    {
-        private const string SystemPrivateCoreLib = "System.Private.CoreLib";
-        private AssemblyNameReference _correctCorlib;
-
-        public PostProcessorReflectionImporter(ModuleDefinition module) : base(module)
-        {
-            _correctCorlib = module.AssemblyReferences.FirstOrDefault(a =>
-                a.Name == "mscorlib" || a.Name == "netstandard" || a.Name == SystemPrivateCoreLib);
-        }
-
-        public override AssemblyNameReference ImportReference(AssemblyName reference)
-        {
-            if (_correctCorlib != null && reference.Name == SystemPrivateCoreLib)
-            {
-                return _correctCorlib;
-            }
-
-            return base.ImportReference(reference);
         }
     }
 }
