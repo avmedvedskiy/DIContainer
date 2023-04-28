@@ -7,14 +7,14 @@ namespace DI
         public ConcreteLazyType<TContract, TConcrete> AsSingle()
         {
             ImplementationResolver<TContract>.Set(
-                new LazySingleImplementation<TConcrete>() as IImplementation<TContract>);
+                new LazySingleImplementation<TContract, TConcrete>());
             return new ConcreteLazyType<TContract, TConcrete>();
         }
 
         public void AsTransient()
         {
             ImplementationResolver<TContract>.Set(
-                new TransientImplementation<TConcrete>() as IImplementation<TContract>);
+                new TransientImplementation<TContract, TConcrete>());
         }
     }
 

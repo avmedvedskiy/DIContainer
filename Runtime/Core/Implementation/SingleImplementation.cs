@@ -10,14 +10,14 @@ namespace DI
         }
     }
 
-    internal struct LazySingleImplementation<T> : IImplementation<T>
+    internal struct LazySingleImplementation<TContract, TConcrete> : IImplementation<TContract> where TConcrete : TContract
     {
-        private T _instance;
-        public T Instance => _instance ??= Factory.Create<T>();
+        private TContract _instance;
+        public TContract Instance => _instance ??= Factory.Create<TConcrete>();
     }
 
-    internal readonly struct TransientImplementation<T> : IImplementation<T>
+    internal readonly struct TransientImplementation<TContract, TConcrete> : IImplementation<TContract> where TConcrete : TContract
     {
-        public T Instance => Factory.Create<T>();
+        public TContract Instance => Factory.Create<TConcrete>();
     }
 }
