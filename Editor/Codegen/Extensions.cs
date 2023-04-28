@@ -1,8 +1,11 @@
 using System;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Collections.Generic;
+using Unity.CompilationPipeline.Common.ILPostProcessing;
 using ICustomAttributeProvider = Mono.Cecil.ICustomAttributeProvider;
 
 namespace DI.Codegen
@@ -16,7 +19,7 @@ namespace DI.Codegen
                 Console.WriteLine(instruction);
             }
         }
-        
+
         public static CustomAttribute GetCustomAttribute<T>(this ICustomAttributeProvider instance)
         {
             if (!instance.HasCustomAttributes)
@@ -45,6 +48,26 @@ namespace DI.Codegen
                 moduleDefinition.ImportReference(type.GetMethod(name,
                     BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)),
                 arguments);
+        }
+
+        public static AssemblyDefinition ConvertToAssemblyDefinition(this ICompiledAssembly compiledAssembly)
+        {
+            var resolver = new PostProcessorAssemblyResolver(compiledAssembly);
+            var readerParameters = new ReaderParameters
+            {
+                SymbolStream = new MemoryStream(compiledAssembly.InMemoryAssembly.PdbData.ToArray()),
+                SymbolReaderProvider = new PortablePdbReaderProvider(),
+                AssemblyResolver = resolver,
+                ReflectionImporterProvider = new PostProcessorReflectionImporterProvider(),
+                ReadingMode = ReadingMode.Immediate,
+            };
+
+            var peStream = new MemoryStream(compiledAssembly.InMemoryAssembly.PeData.ToArray());
+            var assemblyDefinition = AssemblyDefinition.ReadAssembly(peStream, readerParameters);
+
+            resolver.AddAssemblyDefinitionBeingOperatedOn(assemblyDefinition);
+
+            return assemblyDefinition;
         }
 
         private static MethodReference MakeGenericMethod(MethodReference self, params TypeReference[] arguments)

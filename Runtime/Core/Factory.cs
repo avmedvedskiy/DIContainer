@@ -1,11 +1,38 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
 namespace DI
 {
-    internal static class Factory
+    /* can be cached in runtime, but performance unclear
+        /// <summary>
+        /// this dictionary will be filled by codegen type GeneratedCachedFactoriesForContainer when
+        /// will be called unity RuntimeInitializeLoadType.SubsystemRegistration
+        /// </summary>
+        public static Dictionary<Type, Func<object>> CachedFactories = new();
+        
+        internal static T Create<T>()
+        {
+            T result ;
+            if (CachedFactories.TryGetValue(typeof(T), out var factory))
+            {
+                //Debug.Log($"Cached factory {typeof(T)}");
+                result =  (T)factory.Invoke();
+            }
+            else
+            {
+                //Debug.Log("constructorInfo factory");
+                var constructorInfo = typeof(T).GetConstructors()[0];
+                result = (T)constructorInfo.Invoke(new object[constructorInfo.GetParameters().Length]);
+            }
+            RegisterToInternalInterfaces(result);
+            return result;
+        }
+     */
+    public static class Factory
     {
+
         private static ITickableManager TickableManager => Dependency.Resolve<ITickableManager>();
         private static IPauseManager PauseManager => Dependency.Resolve<IPauseManager>();
 
@@ -48,7 +75,7 @@ namespace DI
         }
 
 
-        static void RegisterToInternalInterfaces<T>(T result)
+        private static void RegisterToInternalInterfaces<T>(T result)
         {
             switch (result)
             {

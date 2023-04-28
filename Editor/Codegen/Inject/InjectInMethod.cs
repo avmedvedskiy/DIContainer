@@ -21,6 +21,10 @@ namespace DI.Codegen
         public void Process()
         {
             Console.WriteLine($"Inject in Method class {_typeDefinition.FullName} {_methodDefinition.Name}");
+            //_methodDefinition.Body.Instructions.Write();
+            
+            if(_methodDefinition.Parameters.Count == 0)
+                return;
             
             var instructions = _methodDefinition.Body.Instructions;
             var oldInstructions = instructions.ToArray();
