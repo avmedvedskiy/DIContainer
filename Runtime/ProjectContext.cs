@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace DI
 {
@@ -12,17 +11,9 @@ namespace DI
         private void Awake()
         {
             Container = new DependencyContainer();
-            InstallDefaultBindings();
             InstallBindings();
             DontDestroyOnLoad(gameObject);
         }
-
-        private void InstallDefaultBindings()
-        {
-            Container.Bind<ITickableManager>().FromComponentInNewGameObject<TickableManager>().AsSingle().NonLazy();
-            Container.Bind<IPauseManager>().FromComponentInNewGameObject<PauseManager>().AsSingle().NonLazy();
-        }
-
         private void InstallBindings()
         {
             foreach (var monoInstaller in _installers)
