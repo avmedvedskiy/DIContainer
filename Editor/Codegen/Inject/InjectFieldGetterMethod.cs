@@ -98,6 +98,9 @@ namespace DI.Codegen
 
         private void InjectResolveInstructions(MethodDefinition methodDefinition)
         {
+            if(methodDefinition.IsStatic != _fieldDefinition.IsStatic)
+                return;
+            
             var instructions = methodDefinition.Body.Instructions;
             instructions.Insert(0, Instruction.Create(OpCodes.Stfld, _fieldDefinition));
             instructions.Insert(0, Instruction.Create(OpCodes.Call, _getServiceMethodReference));
