@@ -1,7 +1,7 @@
 {
   "name": "com.avmedvedskiy.services",
   "displayName": "DI Container",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "unity": "2020.3",
   "author": "avmedvedskiy",
   "description": "DI Container",

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -11,7 +12,7 @@ namespace DI
         /// will be called unity RuntimeInitializeLoadType.SubsystemRegistration
         /// </summary>
         public static Dictionary<Type, Func<object>> CachedFactories = new();
-        
+
         internal static T Create<T>()
         {
             T result ;
@@ -32,14 +33,30 @@ namespace DI
      */
     public static class Factory
     {
-
         private static ITickableManager TickableManager => Dependency.Resolve<ITickableManager>();
         private static IPauseManager PauseManager => Dependency.Resolve<IPauseManager>();
 
         internal static T Create<T>()
         {
             var constructorInfo = typeof(T).GetConstructors()[0];
-            T result = (T)constructorInfo.Invoke(new object[constructorInfo.GetParameters().Length]);
+            var autoInjected = Attribute.IsDefined(constructorInfo, typeof(InjectAttribute));
+            var parameters = constructorInfo.GetParameters();
+            T result;
+            if (autoInjected || parameters is { Length: 0 })
+            {
+                result = (T)constructorInfo.Invoke(new object[constructorInfo.GetParameters().Length]);
+            }
+            else
+            {
+                var arguments = new object[parameters.Length];
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    var parameter = parameters[i];
+                    arguments[i] = ReflectionDependency.ResolveByReflection(parameter.ParameterType);
+                }
+                result = (T)constructorInfo.Invoke(arguments);
+            }
+
             RegisterToInternalInterfaces(result);
             return result;
         }
