@@ -2,7 +2,8 @@
     "name": "Unity.DIContainer.Codegen",
     "rootNamespace": "",
     "references": [
-        "GUID:fd6e8ac4b6eac80408d3ea1b08e9acc4"
+        "GUID:fd6e8ac4b6eac80408d3ea1b08e9acc4",
+        "GUID:c5ecc461727906345a35491a0440694f"
     ],
     "includePlatforms": [
         "Editor"

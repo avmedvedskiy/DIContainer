@@ -12,6 +12,9 @@ namespace DI.Codegen
 {
     internal static class Extensions
     {
+        public static bool HasReferenceToContainer(this ICompiledAssembly compiledAssembly)
+            => compiledAssembly.References.Any(f => Path.GetFileName(f) == "DIContainer.Runtime.dll");
+        
         public static void Write(this Collection<Instruction> instructions)
         {
             foreach (var instruction in instructions)

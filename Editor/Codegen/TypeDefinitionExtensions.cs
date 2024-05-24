@@ -18,6 +18,11 @@ namespace DI.Codegen
             return FindParentMethod(typeDefinition.BaseType?.Resolve(), methodName);
         }
 
+        public static Type Convert(this TypeReference typeReference)
+        {
+            return Type.GetType($"{typeReference.FullName}, {typeReference.Module.Assembly.FullName}"); 
+        }
+
         public static bool IsMonoBehaviourClass(this TypeDefinition typeReference) 
             => IsNestedTypeOf(typeReference, typeof(MonoBehaviour));
 

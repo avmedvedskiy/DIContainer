@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using DI.Codegen.Linker;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Unity.CompilationPipeline.Common.Diagnostics;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
+using UnityEditor;
+using UnityEngine;
 
 namespace DI.Codegen
 {
@@ -14,10 +18,7 @@ namespace DI.Codegen
         public override ILPostProcessor GetInstance() => this;
 
         public override bool WillProcess(ICompiledAssembly compiledAssembly)
-            => HasReferenceToContainer(compiledAssembly);
-
-        private bool HasReferenceToContainer(ICompiledAssembly compiledAssembly)
-            => compiledAssembly.References.Any(f => Path.GetFileName(f) == "DIContainer.Runtime.dll");
+            => compiledAssembly.HasReferenceToContainer();
 
         public override ILPostProcessResult Process(ICompiledAssembly compiledAssembly)
         {
@@ -33,6 +34,7 @@ namespace DI.Codegen
             {
                 types.AddInjectInConstructor(assemblyDefinition);
                 //CachedFactoriesCreator.Create(types, assemblyDefinition);
+                SaveClassesInFile(types);
             }
 
             var diagnostics = new List<DiagnosticMessage>();
@@ -58,5 +60,15 @@ namespace DI.Codegen
 
             return new ILPostProcessResult(new InMemoryAssembly(pe.ToArray(), pdb.ToArray()), diagnostics);
         }
+
+        private void SaveClassesInFile(List<TypeDefinition> types)
+        {
+            var names = types
+                .Select(x => Assembly.CreateQualifiedName(x.Module.Assembly.FullName, x.FullName));
+            
+            LinkerBuildPlayerProcessor.WriteTempFile(names.ToArray());
+        }
+        
+        
     }
 }
