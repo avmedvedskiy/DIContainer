@@ -36,7 +36,7 @@ namespace DI
         private static ITickableManager TickableManager => Dependency.Resolve<ITickableManager>();
         private static IPauseManager PauseManager => Dependency.Resolve<IPauseManager>();
 
-        internal static T Create<T>()
+        internal static T Create<T>(object[] arguments = default)
         {
             var constructorInfo = typeof(T).GetConstructors()[0];
             var autoInjected = Attribute.IsDefined(constructorInfo, typeof(InjectAttribute));
@@ -48,17 +48,24 @@ namespace DI
             }
             else
             {
-                var arguments = new object[parameters.Length];
-                for (int i = 0; i < parameters.Length; i++)
-                {
-                    var parameter = parameters[i];
-                    arguments[i] = ReflectionDependency.ResolveByReflection(parameter.ParameterType);
-                }
+                arguments ??= FillArguments<T>(parameters);
                 result = (T)constructorInfo.Invoke(arguments);
             }
 
             RegisterToInternalInterfaces(result);
             return result;
+        }
+
+        private static object[] FillArguments<T>(ParameterInfo[] parameters)
+        {
+            var arguments = new object[parameters.Length];
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                var parameter = parameters[i];
+                arguments[i] = ReflectionDependency.ResolveByReflection(parameter.ParameterType);
+            }
+
+            return arguments;
         }
 
         internal static T CreateNewGameObject<T>() where T : Component
