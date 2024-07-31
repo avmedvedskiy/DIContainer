@@ -36,7 +36,7 @@ namespace DI
         private static ITickableManager TickableManager => Dependency.Resolve<ITickableManager>();
         private static IPauseManager PauseManager => Dependency.Resolve<IPauseManager>();
 
-        internal static T Create<T>(object[] arguments = default)
+        internal static T Create<T>()
         {
             var constructorInfo = typeof(T).GetConstructors()[0];
             var autoInjected = Attribute.IsDefined(constructorInfo, typeof(InjectAttribute));
@@ -48,10 +48,17 @@ namespace DI
             }
             else
             {
-                arguments ??= FillArguments<T>(parameters);
-                result = (T)constructorInfo.Invoke(arguments);
+                result = (T)constructorInfo.Invoke(FillArguments<T>(parameters));
             }
 
+            RegisterToInternalInterfaces(result);
+            return result;
+        }
+        
+        internal static T Create<T>(object[] arguments)
+        {
+            var constructorInfo = typeof(T).GetConstructors()[0];
+            var result = (T)constructorInfo.Invoke(arguments);
             RegisterToInternalInterfaces(result);
             return result;
         }
