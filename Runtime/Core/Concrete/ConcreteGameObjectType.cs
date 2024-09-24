@@ -2,19 +2,19 @@ using UnityEngine;
 
 namespace DI
 {
-    public readonly struct ConcreteGameObjectType<TContract, TComponent> where TComponent : Component
+    public readonly struct ConcreteGameObjectType<TContract, TComponent> where TComponent : Component, TContract
     {
         public ConcreteGameObjectLazyType<TContract, TComponent> AsSingle()
         {
             ImplementationResolver<TContract>.Set(
-                new SingleLazyGameObjectImplementation<TComponent>() as IImplementation<TContract>);
+                new SingleLazyGameObjectImplementation<TContract, TComponent>());
             return new ConcreteGameObjectLazyType<TContract, TComponent>();
         }
 
         public void AsTransient()
         {
             ImplementationResolver<TContract>.Set(
-                new TransientGameObjectImplementation<TComponent>() as IImplementation<TContract>);
+                new TransientGameObjectImplementation<TComponent>());
         }
     }
 

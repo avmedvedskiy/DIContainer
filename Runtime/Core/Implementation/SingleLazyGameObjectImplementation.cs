@@ -2,10 +2,10 @@ using UnityEngine;
 
 namespace DI
 {
-    internal struct SingleLazyGameObjectImplementation<T> : IImplementation<T> where T : Component
+    internal struct SingleLazyGameObjectImplementation<TContract, TConcrete> : IImplementation<TContract> where TConcrete : Component, TContract
     {
-        private T _instance;
-        public T Instance => _instance ??= Factory.CreateNewGameObject<T>();
+        private TContract _instance;
+        public TContract Instance => _instance ??= Factory.CreateNewGameObject<TConcrete>();
     }
 
 
