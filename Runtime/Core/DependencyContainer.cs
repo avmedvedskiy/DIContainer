@@ -13,6 +13,6 @@ namespace DI
             ImplementationResolver<TContract>.Instance;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public T Instantiate<T>() => Resolve<T>();
+        public T Instantiate<T>() => Factory.Create<T>();
     }
 }
