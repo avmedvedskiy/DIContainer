@@ -39,7 +39,7 @@ public class CustomInstaller : MonoInstaller
     {
         Container.Bind<IStateMachine>().To<GameStateMachine>().AsSingle(); // bind IState Machine to GameStateMachine realization as Single
         Container.Bind<IUpdater>().FromComponentInNewPrefab(_updater).AsSingle(); // binding IUpdate from prefab as Single
-        Container.BindSelf<UserStorageService>().AsSingle(); // binding UserStorageService as Single
+        Container.Bind<UserStorageService>().ToSelf().AsSingle(); // binding UserStorageService as Single
     }
 }
 ```
