@@ -35,5 +35,10 @@ namespace DI
         {
             return new ConcreteType<TContract, TClass>();
         }
+        
+        public ConcreteType<TContract, TContract> ToSelf()
+        {
+            return new ConcreteType<TContract, TContract>();
+        }
     }
 }

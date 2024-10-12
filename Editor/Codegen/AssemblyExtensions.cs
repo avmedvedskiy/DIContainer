@@ -4,6 +4,7 @@ using System.Linq;
 using Mono.Cecil;
 using Mono.Cecil.Cil;
 using Mono.Cecil.Rocks;
+using UnityEngine;
 
 namespace DI.Codegen
 {
@@ -23,15 +24,28 @@ namespace DI.Codegen
             foreach (var method in methods)
             {
                 var methodReferences = GetCallsBind(method);
-                foreach (var reference in methodReferences)
+                foreach (MethodReference reference in methodReferences)
                 {
-                    var type = ((GenericInstanceMethod)reference).GenericArguments[0].Resolve();
-                    types.Add(type);
+                    if (reference is GenericInstanceMethod genericInstanceMethod)
+                    {
+                        var type = genericInstanceMethod.GenericArguments[0].Resolve();
+                        types.Add(type);
+                    }
+                    else
+                    {
+                        if (reference.DeclaringType is GenericInstanceType genericInstanceType)
+                        {
+                            var type = genericInstanceType.GenericArguments.First().Resolve();
+                            types.Add(type);
+                            
+                        }
+                    }
                 }
             }
 
             return types;
         }
+         
         public static void AddInjectInConstructor(this List<TypeDefinition> typeDefinitions, AssemblyDefinition assembly)
         {
             foreach (var typeDefinition in typeDefinitions)
@@ -88,8 +102,7 @@ namespace DI.Codegen
             return method.Body.Instructions
                 .Where(instruction => instruction.OpCode == OpCodes.Callvirt || instruction.OpCode == OpCodes.Call)
                 .Select(instruction => (MethodReference)instruction.Operand)
-                .Where(methodReference => methodReference.FullName.Contains("::To") ||
-                                          methodReference.FullName.Contains("::BindSelf"));
+                .Where(methodReference => methodReference.FullName.Contains("::To"));
         }
     }
 }

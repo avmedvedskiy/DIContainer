@@ -8,11 +8,11 @@ namespace DI
         public ContractType<TContact> Bind<TContact>() =>
             new();
 
-        public ConcreteType<TConcrete, TConcrete> BindSelf<TConcrete>() =>
-            new();
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TContract Resolve<TContract>() =>
             ImplementationResolver<TContract>.Instance;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T Instantiate<T>() => Resolve<T>();
     }
 }
