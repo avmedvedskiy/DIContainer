@@ -10,10 +10,10 @@ Implement own installers inherit MonoInstaller, add all installers into ProjectC
 
 ## DependencyContainer methods
 - <b>Bind<TContract></b> - binding a contract type
-- <b>BindSelf<TContract></b> - binding a contract-concrete Type
 
 After binding need to set a concrete type
 - <b>To<TConctere></b> - setting a concrete realization type
+- <b>ToSelf<TConctere></b> - setting a self concrete type
 - <b>FromInstance<TConctere></b> - setting instance, Instance can be like a Singleton Scope
 - <b>FromComponentInNewPrefab<TConctereComponent></b> - Instantiate prefab and get Component
 - <b>FromMethod<TConctereComponent></b> - Create instance type from method
