@@ -10,8 +10,5 @@
     "locator",
     "DI",
     "Container"
-  ],
-  "dependencies": {
-    "com.unity.nuget.mono-cecil": "1.11.4"
-  }
+  ]
 }
