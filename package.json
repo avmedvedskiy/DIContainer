@@ -1,7 +1,7 @@
 {
   "name": "com.avmedvedskiy.di",
   "displayName": "Infrastructure.DI",
-  "version": "1.2.3",
+  "version": "1.2.6",
   "unity": "2020.3",
   "author": "avmedvedskiy",
   "description": "DI Container",

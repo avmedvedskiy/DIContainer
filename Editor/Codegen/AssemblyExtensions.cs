@@ -102,7 +102,7 @@ namespace DI.Codegen
             return method.Body.Instructions
                 .Where(instruction => instruction.OpCode == OpCodes.Callvirt || instruction.OpCode == OpCodes.Call)
                 .Select(instruction => (MethodReference)instruction.Operand)
-                .Where(methodReference => methodReference.FullName.Contains("::To"));
+                .Where(methodReference => methodReference.FullName.Contains("::To") || methodReference.FullName.Contains("::Instantiate"));
         }
     }
 }
