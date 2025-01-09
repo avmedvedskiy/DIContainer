@@ -66,9 +66,7 @@ namespace DI.Codegen
             var names = types
                 .Select(x => Assembly.CreateQualifiedName(x.Module.Assembly.FullName, x.FullName));
             
-            LinkerBuildPlayerProcessor.WriteTempFile(names.ToArray());
+            LinkXmlTempStorage.WriteTempFile(names.ToArray());
         }
-        
-        
     }
 }

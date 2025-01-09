@@ -1,32 +1,48 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using UnityEditor.Build;
+using UnityEditor;
+using UnityEditor.Compilation;
 
 namespace DI.Codegen.Linker
 {
-
-    public class LinkerBuildPlayerProcessor : BuildPlayerProcessor
+    public static class LinkXmlTempStorage
     {
         private static string GetPathToAllUsedClasses() =>
             Path.Combine(Directory.GetCurrentDirectory(), "Library/AllDiClasses.txt");
 
-        private static string GetPathToLinkXml() => Path.Combine(Directory.GetCurrentDirectory(), "Assets/link.xml");
 
         public static void WriteTempFile(string[] classNames) =>
             File.WriteAllLines(GetPathToAllUsedClasses(), classNames);
 
-        private static string[] ReadAllUsedClasses() =>
+        public static string[] ReadAllUsedClasses() =>
             File.Exists(GetPathToAllUsedClasses())
                 ? File.ReadAllLines(GetPathToAllUsedClasses())
                 : Array.Empty<string>();
+    }
+    
+    [InitializeOnLoad]
+    public static class LinkXmlGenerator
+    {
+        static LinkXmlGenerator()
+        {
+            // Подписываемся на событие завершения компиляции
+            CompilationPipeline.compilationFinished += OnCompilationFinished;
+        }
         
-        public override void PrepareForBuild(BuildPlayerContext buildPlayerContext)
+        private static string GetPathToLinkXml() => Path.Combine(Directory.GetCurrentDirectory(), "Assets/link.xml");
+
+        private static void OnCompilationFinished(object value)
         {
             var linker = UnityEditor.Build.Pipeline.Utilities.LinkXmlGenerator.CreateDefault();
-            var allTypes = ReadAllUsedClasses().Select(Type.GetType);
+            var allTypes = LinkXmlTempStorage.ReadAllUsedClasses().Select(Type.GetType);
             linker.AddTypes(allTypes);
             linker.Save(GetPathToLinkXml());
+        }
+
+        [MenuItem("Tools/Generate Link.xml")] // Опция для ручного запуска генерации
+        public static void GenerateLinkXml()
+        {
         }
     }
 }
