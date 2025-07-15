@@ -1,7 +1,7 @@
 {
   "name": "com.avmedvedskiy.di",
   "displayName": "Infrastructure.DI",
-  "version": "1.2.7",
+  "version": "1.2.8",
   "unity": "2020.3",
   "author": "avmedvedskiy",
   "description": "DI Container",
@@ -10,5 +10,14 @@
     "locator",
     "DI",
     "Container"
-  ]
+  ],
+  "documentationUrl": "https://github.com/avmedvedskiy/DIContainer",
+  "changelogUrl": "https://github.com/avmedvedskiy/DIContainer/releases",
+  "_upm":
+  {
+	  "changelog" : "### Fixes & Improvements\n - Add link to changelog and documentation"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.com"
+  }
 }
