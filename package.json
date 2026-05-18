@@ -18,6 +18,6 @@
 	  "changelog" : "### Fixes & Improvements\n - Update package json for changelog"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.com"
+    "registry": "https://registry.npmjs.org/"
   }
 }
